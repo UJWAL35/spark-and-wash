@@ -84,7 +84,7 @@ export default function Admin() {
   if (!authed)
     return (
       <form className="card panel" onSubmit={handleLogin}>
-        <h2>Admin login</h2>
+        <h2>&ldquo;AMMA&rdquo; SPARK N&apos; WASH · Admin</h2>
         <label>
           Password
           <input
@@ -118,7 +118,7 @@ export default function Admin() {
   return (
     <main className="wrap">
       <div className="row">
-        <h2>Wash control</h2>
+        <h2>&ldquo;AMMA&rdquo; SPARK N&apos; WASH · Wash Control</h2>
         <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
           <input type="date" style={{ width: "auto" }} value={date} onChange={(e) => setDate(e.target.value)} />
           <button className="btn alt sm" onClick={handleLogout}>Log out</button>

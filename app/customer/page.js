@@ -232,12 +232,23 @@ function Dashboard({ user, reload }) {
 function Book({ user, onBooked }) {
   const vehicles = user.vehicles || [];
   const [vehicle, setVehicle] = useState(vehicles[0]?.number || "");
-  const [service, setService] = useState("basic");
+  const [service, setService] = useState("car_full_5s");
   const [date, setDate] = useState(today());
   const [slots, setSlots] = useState([]);
   const [slot, setSlot] = useState("");
   const [err, setErr] = useState("");
   const [bookingLoading, setBookingLoading] = useState(false);
+
+  // Pre-select service from URL if provided
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const s = params.get("service");
+      if (s && SERVICES[s]) {
+        setService(s);
+      }
+    }
+  }, []);
 
   // Automatically keep vehicle selection valid if vehicles change
   useEffect(() => {
@@ -315,11 +326,24 @@ function Book({ user, onBooked }) {
       <label>
         Service
         <select value={service} onChange={(e) => setService(e.target.value)}>
-          {Object.entries(SERVICES).map(([k, s]) => (
-            <option key={k} value={k}>
-              {s.name}
-            </option>
-          ))}
+          <optgroup label="Car & Bike Wash Payment">
+            {Object.entries(SERVICES)
+              .filter(([_, s]) => s.category === "wash")
+              .map(([k, s]) => (
+                <option key={k} value={k}>
+                  {s.name}
+                </option>
+              ))}
+          </optgroup>
+          <optgroup label="Car Polish Payment">
+            {Object.entries(SERVICES)
+              .filter(([_, s]) => s.category === "polish")
+              .map(([k, s]) => (
+                <option key={k} value={k}>
+                  {s.name}
+                </option>
+              ))}
+          </optgroup>
         </select>
       </label>
       <label>
@@ -393,7 +417,7 @@ function Bookings() {
           ) : (
             <a
               className="btn sm"
-              href={`upi://pay?pa=${upi}&pn=Spark%20and%20Wash&am=${b.amount}&cu=INR&tn=Wash%20${b.vehicleNumber}`}
+              href={`upi://pay?pa=${upi}&pn=${encodeURIComponent('"AMMA" SPARK N\' WASH')}&am=${b.amount}&cu=INR&tn=${encodeURIComponent('Wash ' + b.vehicleNumber)}`}
             >
               Pay with GPay / PhonePe / Paytm
             </a>

@@ -2,8 +2,8 @@ import "./globals.css";
 import Link from "next/link";
 
 export const metadata = {
-  title: "Spark N' Wash | Drive Clean. Shine Everywhere.",
-  description: "Professional car & bike wash, touchless snow foam, and detailing centre. Reserve your slot and drive clean.",
+  title: '"AMMA" SPARK N\' WASH | Car & Bike Wash Centre',
+  description: 'Official car & bike wash, touchless snow foam, and detailing centre. "AMMA" SPARK N\' WASH Mangalore.',
 };
 
 export default function RootLayout({ children }) {
@@ -20,13 +20,20 @@ export default function RootLayout({ children }) {
       <body>
         <header className="nav">
           <Link href="/" className="logo">
-            Spark<b>N&apos;</b>Wash
+            <img
+              src="/images/emblem.png"
+              alt="AMMA SPARK N' WASH Logo"
+              className="nav-logo-img"
+            />
+            <span className="brand-badge">&ldquo;AMMA&rdquo;</span>
+            <span>SPARK<b>N&apos;</b>WASH</span>
           </Link>
           <nav>
             <Link href="/#services">Services</Link>
             <Link href="/#facility">Our Centre</Link>
-            <Link href="/#pricing">Prices</Link>
+            <Link href="/#pricing">Official Rates</Link>
             <Link href="/#reviews">Reviews</Link>
+            <Link href="/#contact">Contact</Link>
             <Link href="/customer" className="ghost">Book a Wash</Link>
             <Link href="/admin" style={{ opacity: 0.7, fontSize: "0.86rem", fontWeight: 500 }}>
               Admin

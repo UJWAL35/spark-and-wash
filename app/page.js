@@ -7,15 +7,15 @@ const CAROUSEL_IMAGES = [
   {
     src: "/images/main-board.jpg",
     tag: "Main Workshop",
-    title: "Spark N' Wash Centre & Reception",
-    desc: "Our primary workshop facility with customer reception, bike detailing, battery diagnostics, and accessories.",
+    title: '"AMMA" Spark N\' Wash Centre & Reception',
+    desc: "Our primary facility with customer reception, bike & car detailing, Amaron battery service, and accessories.",
     position: "center top",
   },
   {
     src: "/images/wash-bay.jpg",
     tag: "Washing Bay",
     title: "High-Pressure Multi-Vehicle Bay",
-    desc: "Equipped with dual elevated wash ramps, underbody wash pits, and commercial-grade pressure washing guns.",
+    desc: "Equipped with dual elevated wash ramps, underbody wash pits, and commercial-grade high-pressure washing guns.",
     position: "center center",
   },
   {
@@ -32,6 +32,35 @@ const CAROUSEL_IMAGES = [
     desc: "Complete engine degreasing, deep spoke and wheel scrub, foam blanket, and high-pressure finishing rinse.",
     position: "center 30%",
   },
+];
+
+const WASH_RATES = [
+  { name: "Bike Only Water Wash", type: "Two Wheeler", price: 100, badge: "bike", key: "bike_water" },
+  { name: "Bike Normal Wash", type: "Two Wheeler", price: 200, badge: "bike", key: "bike_normal" },
+  { name: "Bike Diesel Wash", type: "Two Wheeler", price: 300, badge: "bike", key: "bike_diesel" },
+  { name: "Car Only Water Wash", type: "Normal / Big Car", price: 200, badge: "car5", key: "car_water" },
+  { name: "Car Only Out Side Wash", type: "Normal Car (5 Seater)", price: 300, badge: "car5", key: "car_outside" },
+  { name: "Car Out Side Wash Big Vehicle", type: "Big Car (7 Seater / SUV)", price: 400, badge: "car7", key: "car_outside_big" },
+  { name: "Car Body Wash 5 Seater", type: "Normal Car (5 Seater)", price: 500, badge: "car5", key: "car_body_5s" },
+  { name: "Car Body Wash Diesel Wash 5 Seater", type: "Normal Car (5 Seater)", price: 600, badge: "car5", key: "car_body_diesel_5s" },
+  { name: "Car Body Wash 7 Seater", type: "Big Car (7 Seater / SUV)", price: 600, badge: "car7", key: "car_body_7s" },
+  { name: "Car Body Wash Diesel Wash 7 Seater", type: "Big Car (7 Seater / SUV)", price: 700, badge: "car7", key: "car_body_diesel_7s" },
+  { name: "Car Full Wash 5 Seater", type: "Normal Car (5 Seater)", price: 600, badge: "car5", key: "car_full_5s" },
+  { name: "Car Full Wash Diesel Wash (5 Seater)", type: "Normal Car (5 Seater)", price: 700, badge: "car5", key: "car_full_diesel_5s" },
+  { name: "Car Full Wash 7 Seater", type: "Big Car (7 Seater / SUV)", price: 700, badge: "car7", key: "car_full_7s" },
+  { name: "Car Full Diesel Wash 7 Seater", type: "Big Car (7 Seater / SUV)", price: 800, badge: "car7", key: "car_full_diesel_7s" },
+];
+
+const POLISH_RATES = [
+  { name: "Normal Polish", normal: 2500, big: 3500, key: "polish_normal" },
+  { name: "Interior Polish", normal: 1500, big: 2500, key: "polish_interior" },
+  { name: "Teflon Polish", normal: 3500, big: 5500, key: "polish_teflon" },
+  { name: "Ceramic Polish", normal: 12500, big: 17500, key: "polish_ceramic" },
+  { name: "All Glass Polish", normal: 2500, big: 2500, key: "polish_glass_all" },
+  { name: "Front Glass Polish", normal: 1000, big: 1000, key: "polish_glass_front" },
+  { name: "Head Light Polish", normal: 600, big: 600, key: "polish_headlight" },
+  { name: "Roof Cleaning", normal: 1000, big: 1000, key: "clean_roof" },
+  { name: "Seat Cleaning", normal: 1000, big: 1000, key: "clean_seat" },
 ];
 
 const SERVICES_LIST = [
@@ -93,6 +122,7 @@ export default function Home() {
   // Circular Carousel State
   const [activeSlide, setActiveSlide] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
+  const [rateTab, setRateTab] = useState("all");
   const totalSlides = CAROUSEL_IMAGES.length;
 
   const nextSlide = useCallback(() => {
@@ -161,7 +191,7 @@ export default function Home() {
         <div className="hero-frame">
           {/* Watermark header */}
           <div className="hero-watermark">
-            <span>SPARK</span>
+            <span>&ldquo;AMMA&rdquo; SPARK</span>
             <span className="outline-text">WASH</span>
           </div>
 
@@ -188,7 +218,7 @@ export default function Home() {
               📘
             </a>
             <a
-              href="https://wa.me"
+              href="https://wa.me/917975185585"
               target="_blank"
               rel="noreferrer"
               className="social-pill"
@@ -204,13 +234,13 @@ export default function Home() {
             <div className="hero-media-box">
               <img
                 src="/images/car-foam.jpg"
-                alt="Active foam wash treatment at Spark N' Wash"
+                alt="Active foam wash treatment at AMMA Spark N' Wash"
               />
               <div className="hero-media-overlay" />
               <div className="hero-media-tag">🚗 Touchless Snow Foam</div>
               <div className="hero-media-bottom">
                 <div>
-                  <b>Spark N&apos; Wash Bay 1</b>
+                  <b>&ldquo;AMMA&rdquo; Spark N&apos; Wash Bay 1</b>
                   <small>Dual Ramps · High Pressure Guns</small>
                 </div>
                 <span className="pill done">Live &amp; Ready</span>
@@ -225,14 +255,14 @@ export default function Home() {
               </h1>
               <p className="hero-subtext">
                 Professional car wash and detailing services that make your vehicle look
-                brand new fast, reliable, and eco-friendly. Transparent prices before you arrive.
+                brand new fast, reliable, and eco-friendly. Transparent rates before you arrive.
               </p>
               <div className="hero-ctas">
                 <Link className="btn" href="/customer">
                   Book Now
                 </Link>
-                <Link className="btn alt" href="#services">
-                  See Services
+                <Link className="btn alt" href="#pricing">
+                  Official Rates
                 </Link>
               </div>
             </div>
@@ -411,58 +441,160 @@ export default function Home() {
       </section>
 
       {/* ========================================================
-          PRICING TABLE (Transparent Rates)
+          OFFICIAL RATE CARD (From Official Amma Spark N' Wash Board)
           ======================================================== */}
       <section id="pricing" className="pricing-section wrap">
         <div className="section-header-center">
-          <span className="pill" style={{ marginBottom: 12 }}>Transparent Rates</span>
-          <h2>Clear Pricing for <span className="blue-text">Every Vehicle</span></h2>
+          <span className="pill" style={{ marginBottom: 12 }}>
+            Official Rate Card · &ldquo;AMMA&rdquo; SPARK N&apos; WASH
+          </span>
+          <h2>
+            Clear Rates for <span className="blue-text">Washing &amp; Polishing</span>
+          </h2>
           <p>
-            Know exactly what you pay before booking. No surprise add-ons. Pay after completion with GPay, PhonePe, Paytm or Cash.
+            Standardized rates as displayed at our centre. No hidden charges.
+            Select any service to instantly reserve your preferred bay and time slot.
           </p>
         </div>
 
-        <div className="grid3">
-          {Object.values(SERVICES).map((s) => (
-            <div className="card tilt" key={s.name}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <h3>{s.name}</h3>
-                <span className="pill">Standard</span>
+        <div className="rate-card-container">
+          <div className="rate-card-header">
+            <div className="rate-card-title">
+              <h3>
+                <img
+                  src="/images/emblem.png"
+                  alt="Logo"
+                  style={{ height: 32, width: "auto" }}
+                />
+                &ldquo;AMMA&rdquo; SPARK N&apos; WASH
+              </h3>
+              <p>Two · Three · Four Wheelers · Car Wash · Polish · Detailing</p>
+            </div>
+            <div className="rate-tabs" role="tablist">
+              <button
+                className={`rate-tab-btn ${rateTab === "all" ? "active" : ""}`}
+                onClick={() => setRateTab("all")}
+              >
+                All Rates
+              </button>
+              <button
+                className={`rate-tab-btn ${rateTab === "wash" ? "active" : ""}`}
+                onClick={() => setRateTab("wash")}
+              >
+                Car &amp; Bike Wash (14)
+              </button>
+              <button
+                className={`rate-tab-btn ${rateTab === "polish" ? "active" : ""}`}
+                onClick={() => setRateTab("polish")}
+              >
+                Car Polish (9)
+              </button>
+            </div>
+          </div>
+
+          {(rateTab === "all" || rateTab === "wash") && (
+            <div style={{ padding: "26px 28px 12px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+                <h4 style={{ fontSize: "1.2rem", color: "var(--navy)", fontWeight: 700 }}>
+                  🚿 Car &amp; Bike Wash Payment
+                </h4>
+                <span className="pill">14 Wash Services</span>
               </div>
-              <p className="note" style={{ margin: "10px 0 16px" }}>
-                Price depends on vehicle category
-              </p>
-              <table>
-                <tbody>
-                  <tr>
-                    <td>Two wheeler</td>
-                    <td className="price" style={{ fontSize: "1.1rem" }}>₹{s.price["2"]}</td>
-                  </tr>
-                  <tr>
-                    <td>Auto / 3 Wheeler</td>
-                    <td>₹{s.price["3"]}</td>
-                  </tr>
-                  <tr>
-                    <td>Four wheeler</td>
-                    <td>₹{s.price["4"]}</td>
-                  </tr>
-                  <tr>
-                    <td>Heavy vehicle</td>
-                    <td>₹{s.price.heavy}</td>
-                  </tr>
-                </tbody>
-              </table>
-              <div style={{ marginTop: 22 }}>
-                <Link
-                  className="btn sm"
-                  style={{ width: "100%", display: "block", textAlign: "center" }}
-                  href="/customer"
-                >
-                  Book {s.name}
-                </Link>
+              <div className="rate-table-responsive">
+                <table className="rate-table">
+                  <thead>
+                    <tr>
+                      <th>Service Name</th>
+                      <th>Category / Vehicle</th>
+                      <th>Official Price</th>
+                      <th style={{ textAlign: "right" }}>Reserve Bay</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {WASH_RATES.map((w) => (
+                      <tr key={w.key}>
+                        <td>
+                          <div className="rate-service-name">
+                            <span>{w.name}</span>
+                          </div>
+                        </td>
+                        <td>
+                          <span className={`rate-pill ${w.badge}`}>{w.type}</span>
+                        </td>
+                        <td>
+                          <span className="rate-price-tag">₹{w.price}</span>
+                        </td>
+                        <td style={{ textAlign: "right" }}>
+                          <Link href={`/customer`} className="btn sm">
+                            Book Slot
+                          </Link>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </div>
-          ))}
+          )}
+
+          {(rateTab === "all" || rateTab === "polish") && (
+            <div style={{ padding: "28px 28px 16px", borderTop: rateTab === "all" ? "2px dashed var(--line)" : "none" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+                <h4 style={{ fontSize: "1.2rem", color: "var(--navy)", fontWeight: 700 }}>
+                  ✨ Car Polish &amp; Detailing Payment
+                </h4>
+                <span className="pill">9 Polish Treatments</span>
+              </div>
+              <div className="rate-table-responsive">
+                <table className="rate-table">
+                  <thead>
+                    <tr>
+                      <th>Polish Treatment</th>
+                      <th>Normal Car (5 Seater)</th>
+                      <th>Big Car (7 Seater / SUV)</th>
+                      <th style={{ textAlign: "right" }}>Reserve Bay</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {POLISH_RATES.map((p) => (
+                      <tr key={p.key}>
+                        <td>
+                          <div className="rate-service-name">
+                            <span className="rate-pill polish">Polish</span>
+                            <span>{p.name}</span>
+                          </div>
+                        </td>
+                        <td>
+                          <span className="rate-price-tag">₹{p.normal.toLocaleString()}</span>
+                        </td>
+                        <td>
+                          <span className="rate-price-tag" style={{ color: "var(--navy)" }}>
+                            ₹{p.big.toLocaleString()}
+                          </span>
+                        </td>
+                        <td style={{ textAlign: "right" }}>
+                          <Link href={`/customer`} className="btn sm">
+                            Book Slot
+                          </Link>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          <div className="rate-card-footer">
+            <div className="rate-card-footer-info">
+              <span>💳 <b>Accepted Payments:</b> GPay · PhonePe · Paytm · UPI · Cash</span>
+              <span>·</span>
+              <span>⚡ <b>Instant Confirmation</b></span>
+            </div>
+            <Link href="/customer" className="btn">
+              Book Any Service Online →
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -501,6 +633,87 @@ export default function Home() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ========================================================
+          CONTACT & LOCATION (From Official Business Card)
+          ======================================================== */}
+      <section id="contact" className="contact-section wrap">
+        <div className="contact-card-box">
+          <div>
+            <div className="contact-title">
+              <img
+                src="/images/logo.png"
+                alt="AMMA Spark N' Wash"
+                style={{ height: 46, width: "auto" }}
+              />
+              <div>
+                <h3>&ldquo;AMMA&rdquo; SPARK N&apos; WASH</h3>
+                <p style={{ color: "var(--mute-light)", fontSize: "0.9rem" }}>
+                  Car Wash &amp; Polish Centre · Bondel, Mangalore
+                </p>
+              </div>
+            </div>
+
+            <div className="contact-detail-row">
+              <div className="contact-icon">📍</div>
+              <div>
+                <b>Workshop Address:</b>
+                <p>
+                  Door No. : 3-T-7/2 (1), Near Guthige House,<br />
+                  Pachanady Village, Near Railway Bridge,<br />
+                  Bondel Post, Mangalore Taluk, D.K. - 575008
+                </p>
+              </div>
+            </div>
+
+            <div className="contact-detail-row">
+              <div className="contact-icon">📞</div>
+              <div>
+                <b>Direct Call &amp; Customer Support:</b>
+                <div className="contact-phone-links">
+                  <a href="tel:7975185585" className="contact-phone-chip">
+                    📞 +91 79751 85585
+                  </a>
+                  <a href="tel:9845846009" className="contact-phone-chip">
+                    📞 +91 98458 46009
+                  </a>
+                  <a
+                    href="https://wa.me/917975185585?text=Hello%20AMMA%20Spark%20N%20Wash,%20I%20want%20to%20book%20a%20wash"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="contact-phone-chip"
+                    style={{ background: "#25D366", borderColor: "#25D366" }}
+                  >
+                    💬 WhatsApp Chat
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="contact-hours-box">
+            <div>
+              <span className="pill done" style={{ marginBottom: 12 }}>
+                Open 7 Days a Week
+              </span>
+              <h4 style={{ color: "#ffffff", fontSize: "1.2rem", marginTop: 8 }}>
+                Operating Hours
+              </h4>
+              <p style={{ color: "#d8e4f8", fontSize: "0.95rem", marginTop: 4 }}>
+                Monday – Sunday: 8:00 AM – 7:30 PM
+              </p>
+            </div>
+            <div style={{ marginTop: 24 }}>
+              <p style={{ color: "var(--mute-light)", fontSize: "0.85rem", marginBottom: 12 }}>
+                Services for Two Wheeler, Three Wheeler, Four Wheeler &amp; Heavy Vehicles.
+              </p>
+              <Link href="/customer" className="btn" style={{ width: "100%", textAlign: "center", display: "block" }}>
+                Reserve Your Time Slot
+              </Link>
+            </div>
           </div>
         </div>
       </section>
