@@ -18,6 +18,20 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body>
+        <div className="soap-bg-layer" aria-hidden="true">
+          <span className="soap-vert-text left">&ldquo;AMMA&rdquo; SPARK N&apos; WASH &nbsp;|&nbsp; CAR &amp; BIKE WASH</span>
+          <span className="soap-vert-text right">&ldquo;AMMA&rdquo; SPARK N&apos; WASH &nbsp;|&nbsp; FOAM &amp; POLISH</span>
+          <span className="soap-bubble b1" />
+          <span className="soap-bubble b2" />
+          <span className="soap-bubble b3" />
+          <span className="soap-bubble b4" />
+          <span className="soap-bubble b5" />
+          <span className="soap-bubble b6" />
+          <span className="soap-bubble b7" />
+          <span className="soap-bubble b8" />
+          <span className="soap-bubble b9" />
+          <span className="soap-bubble b10" />
+        </div>
         <header className="nav">
           <Link href="/" className="logo">
             <img

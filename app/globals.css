@@ -26,11 +26,112 @@
 body {
   font-family: var(--body);
   color: var(--ink);
-  background: #ffffff;
+  background-color: #1266e3;
+  background-image:
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.065'/%3E%3C/svg%3E"),
+    radial-gradient(circle at 18% 15%, rgba(92, 196, 255, 0.55) 0%, transparent 45%),
+    radial-gradient(circle at 82% 28%, rgba(56, 172, 255, 0.45) 0%, transparent 48%),
+    radial-gradient(circle at 50% 62%, rgba(21, 101, 232, 0.35) 0%, transparent 55%),
+    linear-gradient(175deg, #35a0ff 0%, #1672ec 38%, #0c4ec2 72%, #051c47 100%);
+  background-attachment: fixed;
+  min-height: 100vh;
+  position: relative;
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   letter-spacing: -0.015em;
+}
+
+main, header.nav {
+  position: relative;
+  z-index: 2;
+}
+
+/* Soap Bubble & Vertical Watermark Backdrop */
+.soap-bg-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.soap-vert-text {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  writing-mode: vertical-rl;
+  font-family: var(--head);
+  font-weight: 800;
+  font-size: 0.78rem;
+  letter-spacing: 0.28em;
+  color: rgba(255, 255, 255, 0.13);
+  text-transform: uppercase;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.soap-vert-text.left {
+  left: 12px;
+  transform: translateY(-50%) rotate(180deg);
+}
+
+.soap-vert-text.right {
+  right: 12px;
+}
+
+@media (max-width: 900px) {
+  .soap-vert-text {
+    display: none;
+  }
+}
+
+.soap-bubble {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 32% 28%,
+    rgba(255, 255, 255, 0.45) 0%,
+    rgba(255, 255, 255, 0.12) 24%,
+    rgba(135, 212, 255, 0.06) 58%,
+    rgba(255, 255, 255, 0.32) 92%,
+    rgba(255, 255, 255, 0.55) 100%
+  );
+  border: 1.5px solid rgba(255, 255, 255, 0.48);
+  box-shadow:
+    inset -6px -8px 18px rgba(10, 60, 150, 0.18),
+    inset 4px 6px 14px rgba(255, 255, 255, 0.5),
+    0 8px 24px rgba(5, 25, 65, 0.12);
+  animation: bubbleFloat 12s ease-in-out infinite;
+}
+
+.soap-bubble::after {
+  content: "";
+  position: absolute;
+  top: 14%;
+  left: 18%;
+  width: 28%;
+  height: 16%;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.75);
+  transform: rotate(-32deg);
+  filter: blur(0.5px);
+}
+
+.soap-bubble.b1 { width: 150px; height: 150px; top: 8%; left: 3%; animation-delay: 0s; opacity: 0.72; }
+.soap-bubble.b2 { width: 58px; height: 58px; top: 4%; left: 13%; animation-delay: -2s; opacity: 0.85; }
+.soap-bubble.b3 { width: 34px; height: 34px; top: 13%; left: 16%; animation-delay: -4s; opacity: 0.75; }
+.soap-bubble.b4 { width: 210px; height: 210px; top: 18%; right: -3%; animation-delay: -1.5s; opacity: 0.65; }
+.soap-bubble.b5 { width: 92px; height: 92px; top: 44%; left: 5%; animation-delay: -5s; opacity: 0.7; }
+.soap-bubble.b6 { width: 44px; height: 44px; top: 52%; left: 11%; animation-delay: -3s; opacity: 0.8; }
+.soap-bubble.b7 { width: 120px; height: 120px; bottom: 18%; right: 4%; animation-delay: -6s; opacity: 0.68; }
+.soap-bubble.b8 { width: 66px; height: 66px; bottom: 10%; left: 14%; animation-delay: -7s; opacity: 0.78; }
+.soap-bubble.b9 { width: 42px; height: 42px; bottom: 26%; right: 12%; animation-delay: -2.5s; opacity: 0.82; }
+.soap-bubble.b10 { width: 28px; height: 28px; top: 34%; right: 14%; animation-delay: -4.5s; opacity: 0.75; }
+
+@keyframes bubbleFloat {
+  0%, 100% { transform: translateY(0px) translateX(0px) scale(1); }
+  50% { transform: translateY(-14px) translateX(6px) scale(1.03); }
 }
 
 h1, h2, h3, h4, .logo, .stat-num {
@@ -193,11 +294,12 @@ a {
 
 .hero-frame {
   position: relative;
-  background: #ffffff;
-  border: 2px solid var(--line);
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(12px);
+  border: 2px solid rgba(255, 255, 255, 0.7);
   border-radius: 36px;
   padding: 40px;
-  box-shadow: 0 20px 60px rgba(10, 42, 94, 0.07);
+  box-shadow: 0 24px 64px rgba(4, 20, 52, 0.28);
   overflow: hidden;
 }
 
@@ -449,7 +551,7 @@ a {
    ======================================================== */
 .carousel-section {
   padding: 60px 5vw 80px;
-  background: linear-gradient(180deg, #ffffff 0%, var(--sky-light) 50%, #ffffff 100%);
+  background: transparent;
   overflow: hidden;
 }
 
@@ -459,13 +561,26 @@ a {
   margin: 0 auto 46px;
 }
 
+.section-header-center .pill {
+  background: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(8px);
+}
+
 .section-header-center h2 {
   font-size: clamp(2rem, 3.8vw, 2.9rem);
   margin-bottom: 12px;
+  color: #ffffff;
+  text-shadow: 0 4px 18px rgba(4, 20, 52, 0.25);
+}
+
+.section-header-center .blue-text {
+  color: #bae6fd;
 }
 
 .section-header-center p {
-  color: var(--mute);
+  color: rgba(235, 245, 255, 0.92);
   font-size: 1.05rem;
 }
 
@@ -616,7 +731,9 @@ a {
    SERVICES SECTION (Inspired by Image 2 - Dark & Blue)
    ======================================================== */
 .services-dark-wrapper {
-  background: linear-gradient(180deg, #05142b 0%, #092042 100%);
+  background: linear-gradient(180deg, rgba(4, 18, 42, 0.9) 0%, rgba(7, 26, 58, 0.95) 100%);
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
   color: #ffffff;
   padding: 70px 5vw 85px;
   position: relative;
@@ -728,7 +845,7 @@ a {
    ======================================================== */
 .pricing-section {
   padding: 70px 5vw 80px;
-  background: #ffffff;
+  background: transparent;
 }
 
 .grid3 {
@@ -781,7 +898,9 @@ th {
    TESTIMONIALS SECTION (Inspired by Image 3)
    ======================================================== */
 .testimonials-section {
-  background: linear-gradient(180deg, #071936 0%, #030d1e 100%);
+  background: linear-gradient(180deg, rgba(5, 21, 48, 0.92) 0%, rgba(3, 12, 28, 0.97) 100%);
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
   color: #fff;
   padding: 75px 5vw 90px;
   position: relative;
@@ -940,7 +1059,7 @@ input:focus, select:focus {
 .tabs {
   display: flex;
   gap: 8px;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.25);
   margin: 20px 0;
 }
 
@@ -949,15 +1068,21 @@ input:focus, select:focus {
   border: 0;
   padding: 12px 18px;
   font: 700 0.95rem var(--head);
-  color: var(--mute);
+  color: rgba(255, 255, 255, 0.78);
   cursor: pointer;
   border-bottom: 3px solid transparent;
   transition: all 0.2s;
 }
 
 .tabs .on {
-  color: var(--blue);
-  border-color: var(--blue);
+  color: #ffffff;
+  border-color: #ffffff;
+}
+
+.wrap > .row h2,
+.wrap > p,
+.wrap > .note {
+  color: #ffffff;
 }
 
 .slots {
@@ -1304,7 +1429,7 @@ tr.urgent {
 /* Contact Strip */
 .contact-section {
   padding: 60px 0;
-  background: #ffffff;
+  background: transparent;
 }
 
 .contact-card-box {
