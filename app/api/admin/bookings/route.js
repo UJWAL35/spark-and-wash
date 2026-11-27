@@ -19,11 +19,16 @@ export async function PATCH(req) {
   try {
     if (!isAdmin()) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     await connect();
-    const { id, status, paid, method } = await req.json().catch(() => ({}));
+    const { id, status, bay, paid, method } = await req.json().catch(() => ({}));
     if (!id) return NextResponse.json({ error: "Booking ID is required" }, { status: 400 });
 
     const set = {};
-    if (status) set.status = status;
+    if (status) {
+      set.status = status;
+      if (status === "washing") set.startedAt = new Date();
+      if (status === "done") set.completedAt = new Date();
+    }
+    if (bay) set.bay = bay;
     if (paid) { set.paid = true; set.method = method || "UPI"; set.paidAt = new Date(); }
     await BookingModel.updateOne({ _id: id }, { $set: set });
     return NextResponse.json({ ok: true });

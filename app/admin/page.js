@@ -53,7 +53,7 @@ export default function Admin() {
 
   useEffect(() => {
     load();
-    const t = setInterval(load, 15000);
+    const t = setInterval(load, 5000);
     return () => clearInterval(t);
   }, [load]);
 
@@ -131,20 +131,64 @@ export default function Admin() {
         <div className="card stat"><span className="note">Pending payment</span><b>₹{dueTotal}</b></div>
       </div>
       <div className="card scroll"><table>
-        <thead><tr><th>Time</th><th>Vehicle</th><th>Customer</th><th>Service</th><th>Status</th><th>Payment</th><th>Actions</th></tr></thead>
+        <thead><tr><th>Time</th><th>Vehicle</th><th>Customer</th><th>Service</th><th>Live Wash Status</th><th>Payment</th><th>Actions</th></tr></thead>
         <tbody>
           {list.map((b) => (
-            <tr key={b._id} className={urgent(b) ? "urgent" : ""}>
-              <td>{b.slot}</td>
+            <tr key={b._id} className={`${urgent(b) ? "urgent" : ""} ${b.status === "washing" ? "row-washing" : ""}`}>
+              <td><b>{b.slot}</b></td>
               <td><b>{b.vehicleNumber}</b><br /><span className="note">{WHEELERS[b.wheeler] || b.wheeler}</span></td>
               <td>{b.name}<br /><span className="note">{b.phone}</span></td>
-              <td>{SERVICES[b.service]?.name}</td>
-              <td><span className={`pill ${urgent(b) ? "urgent" : b.status}`}>{urgent(b) ? `${b.status} · urgent` : b.status}</span></td>
+              <td><b>{SERVICES[b.service]?.name}</b></td>
+              <td>
+                {b.status === "washing" ? (
+                  <span className="pill washing-live">
+                    <span className="live-dot">●</span> 🚿 In {b.bay || "Bay 1"} (Washing)
+                  </span>
+                ) : b.status === "done" ? (
+                  <span className="pill done">✅ Wash Complete</span>
+                ) : (
+                  <span className={`pill ${urgent(b) ? "urgent" : "pending"}`}>
+                    {urgent(b) ? "⏳ Urgent Queued" : "⏳ Awaiting Bay"}
+                  </span>
+                )}
+              </td>
               <td>{b.paid ? <span className="pill paid">₹{b.amount} · {b.method}</span> : <>₹{b.amount} due</>}</td>
               <td>
-                {b.status === "pending" && <button className="btn sm" onClick={() => update(b._id, { status: "washing" })}>Start wash</button>}{" "}
-                {b.status === "washing" && <button className="btn sm" onClick={() => update(b._id, { status: "done" })}>Mark done</button>}{" "}
-                {!b.paid && <button className="btn alt sm" onClick={() => handleRecordPayment(b._id)}>Record payment</button>}
+                <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", alignItems: "center" }}>
+                  {b.status === "pending" && (
+                    <>
+                      <button
+                        className="btn sm"
+                        title="Accept service and place on Bay 1 ramp"
+                        onClick={() => update(b._id, { status: "washing", bay: "Bay 1" })}
+                      >
+                        🚿 Accept &amp; Bay 1
+                      </button>
+                      <button
+                        className="btn alt sm"
+                        title="Accept service and place on Bay 2 ramp"
+                        onClick={() => update(b._id, { status: "washing", bay: "Bay 2" })}
+                      >
+                        Bay 2
+                      </button>
+                    </>
+                  )}
+                  {b.status === "washing" && (
+                    <button
+                      className="btn sm"
+                      style={{ background: "#10b981", borderColor: "#10b981" }}
+                      title="Mark wash as completed"
+                      onClick={() => update(b._id, { status: "done" })}
+                    >
+                      ✅ Mark Done
+                    </button>
+                  )}
+                  {!b.paid && (
+                    <button className="btn alt sm" onClick={() => handleRecordPayment(b._id)}>
+                      Record payment
+                    </button>
+                  )}
+                </div>
               </td>
             </tr>))}
           {!list.length && <tr><td colSpan={7} className="note">No bookings for this date.</td></tr>}

@@ -188,6 +188,26 @@ function Auth({ onDone }) {
 function Dashboard({ user, reload }) {
   const [tab, setTab] = useState("book");
   const [loggingOut, setLoggingOut] = useState(false);
+  const [liveList, setLiveList] = useState([]);
+
+  useEffect(() => {
+    let mounted = true;
+    const checkLive = () => {
+      api("/api/bookings")
+        .then((data) => {
+          if (mounted && Array.isArray(data)) setLiveList(data);
+        })
+        .catch(() => {});
+    };
+    checkLive();
+    const timer = setInterval(checkLive, 4000);
+    return () => {
+      mounted = false;
+      clearInterval(timer);
+    };
+  }, []);
+
+  const washingBooking = liveList.find((b) => b.status === "washing");
 
   const handleLogout = async () => {
     setLoggingOut(true);
@@ -209,7 +229,22 @@ function Dashboard({ user, reload }) {
       <div className="tabs" role="tablist">
         {[
           ["book", "Book a wash"],
-          ["bookings", "My bookings"],
+          [
+            "bookings",
+            washingBooking ? (
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                My bookings{" "}
+                <span
+                  className="pill washing-live"
+                  style={{ padding: "2px 8px", fontSize: "0.74rem", lineHeight: 1.2 }}
+                >
+                  <span className="live-dot">●</span> 1 Washing
+                </span>
+              </span>
+            ) : (
+              "My bookings"
+            ),
+          ],
           ["profile", "Profile and vehicles"],
         ].map(([k, l]) => (
           <button
@@ -222,6 +257,21 @@ function Dashboard({ user, reload }) {
           </button>
         ))}
       </div>
+
+      {washingBooking && tab !== "bookings" && (
+        <div className="live-wash-alert-banner" onClick={() => setTab("bookings")}>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <span className="live-dot">●</span>
+            <span>
+              <b>Wash In Progress:</b> Vehicle <b>{washingBooking.vehicleNumber}</b> is currently on the ramp being washed in {washingBooking.bay || "Bay 1"}!
+            </span>
+          </div>
+          <span className="btn sm" style={{ padding: "4px 14px", fontSize: "0.82rem" }}>
+            Track Live →
+          </span>
+        </div>
+      )}
+
       {tab === "book" && <Book user={user} onBooked={() => setTab("bookings")} />}
       {tab === "bookings" && <Bookings />}
       {tab === "profile" && <Profile user={user} reload={reload} />}
@@ -390,40 +440,231 @@ function Book({ user, onBooked }) {
 
 function Bookings() {
   const [rows, setRows] = useState(null);
+
   useEffect(() => {
-    api("/api/bookings")
-      .then(setRows)
-      .catch(() => setRows([]));
+    let mounted = true;
+    const fetchBookings = () => {
+      api("/api/bookings")
+        .then((data) => {
+          if (mounted && Array.isArray(data)) setRows(data);
+        })
+        .catch(() => {
+          if (mounted) setRows((prev) => prev || []);
+        });
+    };
+
+    fetchBookings();
+    // Auto-poll every 3.5 seconds to instantly reflect admin acceptance or wash updates
+    const interval = setInterval(fetchBookings, 3500);
+    return () => {
+      mounted = false;
+      clearInterval(interval);
+    };
   }, []);
-  if (!rows) return <p>Loading…</p>;
+
+  if (!rows) return <p className="wrap">Loading your bookings…</p>;
   if (!rows.length)
     return <p className="note">No bookings yet. Use “Book a wash” to pick a slot.</p>;
+
   const upi = process.env.NEXT_PUBLIC_UPI_ID || "sparkandwash@upi";
+
+  // Identify any active wash in progress or pending acceptance
+  const activeWash = rows.find((b) => b.status === "washing");
+  const pendingWash = !activeWash && rows.find((b) => b.status === "pending");
+  const featured = activeWash || pendingWash || (rows[0]?.status === "done" ? rows[0] : null);
+
   return (
-    <div className="grid3">
-      {rows.map((b) => (
-        <div className="card tilt" key={b._id}>
-          <div className="row">
-            <b>{b.vehicleNumber}</b>
-            <span className={`pill ${b.status}`}>{b.status}</span>
+    <div>
+      {/* ========================================================
+          LIVE WASH TRACKER CARD (User Request: Track vehicle being washed)
+          ======================================================== */}
+      {featured && (
+        <div className={`live-tracker-card ${featured.status === "washing" ? "active-wash-glow" : ""}`}>
+          <div className="tracker-top-header">
+            <div className="tracker-headline">
+              <span
+                className={`pill ${
+                  featured.status === "washing"
+                    ? "washing-live"
+                    : featured.status === "done"
+                    ? "done"
+                    : "pending"
+                }`}
+              >
+                {featured.status === "washing" ? (
+                  <>
+                    <span className="live-dot">●</span> 🚿 LIVE IN {featured.bay || "BAY 1"} (BEING WASHED)
+                  </>
+                ) : featured.status === "done" ? (
+                  "✅ WASH COMPLETED · READY FOR PICKUP"
+                ) : (
+                  "⏳ AWAITING WASH BAY ACCEPTANCE"
+                )}
+              </span>
+              <h3 className="tracker-title">
+                {featured.status === "washing"
+                  ? "Your vehicle is currently on the ramp being washed!"
+                  : featured.status === "done"
+                  ? "Your vehicle is sparkling clean and ready for pickup!"
+                  : "Booking confirmed! Waiting for bay operator assignment."}
+              </h3>
+              <p className="tracker-subtitle">
+                {featured.status === "washing"
+                  ? `Admin has accepted your service. High-pressure wash, snow foam & underbody rinse active in ${featured.bay || "Bay 1"}.`
+                  : featured.status === "done"
+                  ? "Washing and inspection are complete. Please collect your vehicle from the bay."
+                  : "Operator will accept and place your vehicle on the wash ramp shortly."}
+              </p>
+            </div>
+            <div className="tracker-vehicle-badge">
+              <b>{featured.vehicleNumber}</b>
+              <span>{WHEELERS[featured.wheeler] || featured.wheeler}</span>
+            </div>
           </div>
-          <p>{SERVICES[b.service]?.name}</p>
-          <p className="note">
-            {b.date} at {b.slot}
-          </p>
-          <div className="price">₹{b.amount}</div>
-          {b.paid ? (
-            <span className="pill paid">Paid via {b.method}</span>
-          ) : (
-            <a
-              className="btn sm"
-              href={`upi://pay?pa=${upi}&pn=${encodeURIComponent('"AMMA" SPARK N\' WASH')}&am=${b.amount}&cu=INR&tn=${encodeURIComponent('Wash ' + b.vehicleNumber)}`}
-            >
-              Pay with GPay / PhonePe / Paytm
-            </a>
-          )}
+
+          {/* 3-Step Visual Progress Stepper */}
+          <div className="wash-stepper">
+            <div className="step-item completed">
+              <div className="step-circle">✓</div>
+              <div className="step-info">
+                <b>1. Confirmed</b>
+                <small>{featured.slot} · {featured.date}</small>
+              </div>
+            </div>
+
+            <div className={`step-line ${featured.status === "washing" || featured.status === "done" ? "active" : ""}`} />
+
+            <div className={`step-item ${featured.status === "washing" ? "current-wash" : featured.status === "done" ? "completed" : ""}`}>
+              <div className="step-circle">
+                {featured.status === "done" ? "✓" : "🚿"}
+              </div>
+              <div className="step-info">
+                <b>2. Wash Bay Ramp</b>
+                <small>
+                  {featured.status === "washing"
+                    ? `Washing in ${featured.bay || "Bay 1"}`
+                    : featured.status === "done"
+                    ? "Washed"
+                    : "In Queue"}
+                </small>
+              </div>
+            </div>
+
+            <div className={`step-line ${featured.status === "done" ? "active" : ""}`} />
+
+            <div className={`step-item ${featured.status === "done" ? "completed" : ""}`}>
+              <div className="step-circle">
+                {featured.status === "done" ? "✨" : "3"}
+              </div>
+              <div className="step-info">
+                <b>3. Ready for Pickup</b>
+                <small>{featured.status === "done" ? "Clean & ready" : "Pending completion"}</small>
+              </div>
+            </div>
+          </div>
+
+          {/* Animated Horizontal Progress Bar */}
+          <div className="wash-bar-wrap">
+            <div
+              className={`wash-bar-fill ${featured.status === "washing" ? "animated-wash-bar" : ""}`}
+              style={{
+                width:
+                  featured.status === "done"
+                    ? "100%"
+                    : featured.status === "washing"
+                    ? "66%"
+                    : "33%",
+              }}
+            />
+          </div>
+
+          <div className="tracker-footer">
+            <div>
+              <span className="note">Service Type</span>
+              <div style={{ fontWeight: 700, color: "var(--navy)" }}>
+                {SERVICES[featured.service]?.name}
+              </div>
+            </div>
+            <div>
+              <span className="note">Amount</span>
+              <div className="price" style={{ fontSize: "1.3rem" }}>
+                ₹{featured.amount}
+              </div>
+            </div>
+            <div>
+              {featured.paid ? (
+                <span className="pill paid">Paid via {featured.method}</span>
+              ) : (
+                <a
+                  className="btn sm"
+                  href={`upi://pay?pa=${upi}&pn=${encodeURIComponent('"AMMA" SPARK N\' WASH')}&am=${featured.amount}&cu=INR&tn=${encodeURIComponent('Wash ' + featured.vehicleNumber)}`}
+                >
+                  Pay ₹{featured.amount} with UPI
+                </a>
+              )}
+            </div>
+          </div>
         </div>
-      ))}
+      )}
+
+      {/* ========================================================
+          ALL VEHICLE BOOKING CARDS
+          ======================================================== */}
+      <h3 style={{ margin: "24px 0 16px", color: "var(--navy)", fontSize: "1.25rem" }}>
+        Booking History &amp; Status
+      </h3>
+      <div className="grid3">
+        {rows.map((b) => (
+          <div
+            className={`card tilt ${b.status === "washing" ? "card-washing-active" : ""}`}
+            key={b._id}
+          >
+            <div className="row">
+              <b>{b.vehicleNumber}</b>
+              {b.status === "washing" ? (
+                <span className="pill washing-live">
+                  <span className="live-dot">●</span> 🚿 In {b.bay || "Bay 1"}
+                </span>
+              ) : b.status === "done" ? (
+                <span className="pill done">✅ Completed</span>
+              ) : (
+                <span className="pill pending">⏳ Queued</span>
+              )}
+            </div>
+            <p style={{ fontWeight: 600, marginTop: 6 }}>{SERVICES[b.service]?.name}</p>
+            <p className="note" style={{ fontSize: "0.85rem", marginTop: 2 }}>
+              {b.date} at {b.slot}
+            </p>
+
+            {/* Mini Progress Bar inside card */}
+            <div style={{ width: "100%", height: 6, background: "#e9f0fc", borderRadius: 99, margin: "14px 0 10px", overflow: "hidden" }}>
+              <div
+                style={{
+                  height: "100%",
+                  background: b.status === "done" ? "#10b981" : "var(--blue)",
+                  width: b.status === "done" ? "100%" : b.status === "washing" ? "66%" : "33%",
+                  transition: "width 0.4s",
+                }}
+              />
+            </div>
+
+            <div className="price">₹{b.amount}</div>
+            <div style={{ marginTop: 12 }}>
+              {b.paid ? (
+                <span className="pill paid">Paid via {b.method}</span>
+              ) : (
+                <a
+                  className="btn sm"
+                  style={{ width: "100%", textAlign: "center", display: "block" }}
+                  href={`upi://pay?pa=${upi}&pn=${encodeURIComponent('"AMMA" SPARK N\' WASH')}&am=${b.amount}&cu=INR&tn=${encodeURIComponent('Wash ' + b.vehicleNumber)}`}
+                >
+                  Pay with GPay / PhonePe / Paytm
+                </a>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
